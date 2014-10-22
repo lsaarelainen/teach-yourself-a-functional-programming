@@ -1,5 +1,6 @@
 package euler
 
+
 object ProjectEuler {
   /*
    * Even Fibonacci numbers
@@ -12,8 +13,18 @@ object ProjectEuler {
    * By considering the terms in the Fibonacci sequence whose values do not
    * exceed four million, find the sum of the even-valued terms.
    */
-  def problem2(): Int = ???
-
+  def problem2(): Int = 
+  {
+    def fibo(sum:Int, a:Int, b:Int ):Int =
+    {
+      if (a + b > 4000000) sum
+      else if (( a + b ) % 2 == 0) fibo( sum + a + b, b, a + b)
+      else fibo(sum, b, a + b)
+    }
+      
+      fibo(0, 1, 1)
+    
+  }
   /*
    * Largest palindrome product
    *
@@ -23,7 +34,27 @@ object ProjectEuler {
    * Find the largest palindrome made from the product of two 3-digit numbers.
    *
    */
-  def problem4(): Int = ???
+   
+  def problem4(): Int = ((100 to 999).view.flatMap(x => (x to 999).map(x*)).filter(b => b.toString == b.toString.reverse).max)
+    
+    /*
+    def problem4(): Int =
+    {
+        def countBiggest( a: Int, max:Int ): Int = {
+            def countDownWards( a: Int, b:Int, max:Int ) : Int =
+            {
+                if( b == 99 ) max
+                else if( a * b < max ) max
+                else if( ( a * b ).toString == ( a * b ).toString.reverse ) a * b
+                else countDownWards( a, b - 1, max )
+            }
+            
+            if( a == 99 ) max
+            else if( a * a < max ) max
+            else countBiggest( a - 1, countDownWards( a, a, max ) )
+        }
+        
+        countBiggest( 999, -1 )*/
 
   /*
    * Special Pythagorean triplet
@@ -36,7 +67,40 @@ object ProjectEuler {
    * There exists exactly one Pythagorean triplet for which a + b + c = 1000.
    * Find the product abc.
    */
-  def problem9(): Int = ???
+  def problem9(): Int = 
+  {
+    
+    def tripletForSum(sum: Int) = {
+      val triplets = for (a <- (1 to sum).view;
+      b <- 1 to sum - a;
+      c <- 1 to sum - a - b if(isTriplet(a,b,c,sum))) yield(a,b,c)
+      triplets.head
+      
+    }
+    
+    def isTriplet(a: Int, b: Int, c: Int, sum: Int) = {
+      (a*a) + (b*b) == (c*c) && a + b + c == sum && a < b && b < c
+      
+    }
+    
+    val moi = tripletForSum(1000)
+    (moi._1 * moi._2 * moi._3):Int
+    
+}
+
+/*def problem9():Int =
+    {
+        def count( a: Int, b: Int, c: Int ):Int =
+        {
+            if( a*a + b*b > c*c ) count( a, b, c + 1 )
+            else if( a + b + c  == 1000 && a*a + b*b == c*c )  a * b * c
+            else if( a == b ) count( 1, b + 1, b + 2 )
+            else count( a + 1, b, c )
+        }
+        
+        count( 1, 2, 3 )
+    } */
+  
 
 
   /*
@@ -55,7 +119,30 @@ object ProjectEuler {
    * Find the maximum total from top to bottom of the given triangle with 15
    * rows:
    */
-  def problem18(triangle: List[List[Int]]): Int = ???
+  def problem18(triangle: List[List[Int]]): Int = {
+    
+    
+    val src = scala.io.Source.fromFile("/home/ubuntu/workspace/assignment/src/main/resources/problem18_triangle.txt").getLines.toList.map(_.split(" ").map(_.toInt).toList)
+    
+    def prob18(mappi: List[List[Int]]): Int =
+    {
+        def calculateNewRow( newRow :List[Int], oldRow : List[Int] ) : List[Int] =
+        {
+            if( newRow.isEmpty ) Nil
+            else math.max( oldRow.head,  oldRow.tail.head ) + newRow.head :: calculateNewRow( newRow.tail, oldRow.tail )
+        }
+        
+        def getMax( rows: List[List[Int]], oldRow: List[ Int ] ) : Int =
+        {
+            if( oldRow.tail.isEmpty ) oldRow.head
+            else getMax( rows.take( rows.length - 1), calculateNewRow( rows.takeRight(1).head, oldRow ) )
+            
+        }
+        getMax( mappi.take( mappi.length - 1 ), mappi.takeRight(1).head )
+    }
+    prob18(src)
+ 
+  }
 
   /*
    * Maximum path sum II
@@ -79,5 +166,30 @@ object ProjectEuler {
    * would take over twenty billion years to check them all. There is an
    * efficient algorithm to solve it. ;o)
    */
-  def problem67(triangle: List[List[Int]]): Int = ???
+  def problem67(triangle: List[List[Int]]): Int = {
+    
+    //Tama toimii, mutta erittain hitaasti. Kaytannossa sama kuin 18 toteutus
+    
+    
+    val src2 = scala.io.Source.fromFile("/home/ubuntu/workspace/assignment/src/main/resources/problem67_triangle.txt").getLines.toList.map(_.split(" ").map(_.toInt).toList)
+    
+    def prob67(mappi: List[List[Int]]): Int =
+    {
+        def calculateNewRow( newRow :List[Int], oldRow : List[Int] ) : List[Int] =
+        {
+            if( newRow.isEmpty ) Nil
+            else math.max( oldRow.head,  oldRow.tail.head ) + newRow.head :: calculateNewRow( newRow.tail, oldRow.tail )
+        }
+        
+        def getMax( rows: List[List[Int]], oldRow: List[ Int ] ) : Int =
+        {
+            if( oldRow.tail.isEmpty ) oldRow.head
+            else getMax( rows.take( rows.length - 1), calculateNewRow( rows.takeRight(1).head, oldRow ) )
+            
+        }
+        getMax( mappi.take( mappi.length - 1 ), mappi.takeRight(1).head )
+    }
+    prob67(src2)
+ 
+  }
 }
